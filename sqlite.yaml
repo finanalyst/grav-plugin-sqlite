@@ -1,0 +1,3 @@
+enabled: true
+database_route: data
+database_name: db.sqlite3

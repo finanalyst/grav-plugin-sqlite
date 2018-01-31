@@ -1,0 +1,14 @@
+<table{% if class %} class="{{ class }}"{% endif %}>
+  <thead>
+    <tr>
+      {% for item in fields %}
+      <th{% if attribute(hidden,item) %} style="display: none;"{% endif %}>{{ item }}</th>
+      {% endfor %}</tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}<tr>
+      {% for item in row %}
+        <td>{{ item }}</td>
+      {% endfor %}</tr>
+  {% endfor %}</tbody>
+</table>

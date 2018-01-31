@@ -1,0 +1,25 @@
+name: Sqlite
+version: '0.1.0'
+description: Plugin to select and insert into and sqlite3 database
+icon: database
+author:
+  name: Richard N Hainsworth
+  email: rnhainsworth@gmail.com
+homepage: https://github.com/finanalyst/grav-plugin-sqlite
+bugs: https://github.com/finanalyst/grav-plugin-sqlite/issues
+keywords: [sqlite, grav, plugin]
+readme: https://github.com/finanalyst/grav-plugin-sqlite/README.md
+license: MIT
+
+form:
+  fields:
+    database_name:
+      type: text
+      default: db.sqlite3
+      label: Name of database
+      help: The name of the sqlite3 file with extention
+    database_route:
+      type: text
+      default: data
+      label: Route to database
+      help: The GRAV route to the database (relative to the 'user' directory)
