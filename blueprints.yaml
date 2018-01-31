@@ -16,10 +16,10 @@ form:
     database_name:
       type: text
       default: db.sqlite3
-      label: Name of database
-      help: The name of the sqlite3 file with extention
+      label: PLUGIN_SQLITE.DATABASE_NAME
+      help: PLUGIN_SQLITE.DATABASE_NAME_HELP
     database_route:
       type: text
       default: data
-      label: Route to database
-      help: The GRAV route to the database (relative to the 'user' directory)
+      label: PLUGIN_SQLITE.DATABASE_ROUTE
+      help: PLUGIN_SQLITE.DATABASE_ROUTE_HELP

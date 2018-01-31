@@ -61,7 +61,7 @@ class SqlitePlugin extends Plugin
         if ( isset($this->grav['sqlite']['error'])  && $this->grav['sqlite']['error'] ) {
           $this->grav->fireEvent('onFormValidationError', new Event([
                   'form'    => $event['form'],
-                  'message' => "The database file {$this->grav['sqlite']['error']} does not exist."
+                  'message' => sprintf($grav['language']->translate('PLUGIN_SQLITE.DATABASE_ERROR', null, true), $this->grav['sqlite']['error'])
           ]));
           $event->stopPropagation();
           return;
@@ -86,9 +86,9 @@ class SqlitePlugin extends Plugin
                   } catch ( \Exception $e ) {
                       $msg = $e->getMessage();
                       if ( stripos($msg, 'unique') !== false ) {
-                        $msg .= "<br>One (or more) of the fields is required to be UNIQUE, but it already exists in the database.<br>Is the same data being added again?";
+                        $msg .= $grav['language']->translate(PLUGIN_SQLITE.UNIQUE_FIELD_ERROR);
                       } else {
-                        $msg .= "<br>The form data is causing a database error. Contact the site developer.";
+                        $msg .= $grav['language']->translate(PLUGIN_SQLITE.OTHER_SQL_ERROR);
                       }
                       $this->grav->fireEvent('onFormValidationError', new Event([
                               'form'    => $event['form'],
