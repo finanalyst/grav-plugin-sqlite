@@ -61,16 +61,17 @@ class SqlitePlugin extends Plugin
         if ( isset($this->grav['sqlite']['error'])  && $this->grav['sqlite']['error'] ) {
           $this->grav->fireEvent('onFormValidationError', new Event([
                   'form'    => $event['form'],
-                  'message' => sprintf($grav['language']->translate('PLUGIN_SQLITE.DATABASE_ERROR', null, true), $this->grav['sqlite']['error'])
+                  'message' => sprintf($grav['language']->translate(['PLUGIN_SQLITE.DATABASE_ERROR']), $this->grav['sqlite']['error'])
           ]));
           $event->stopPropagation();
           return;
         }
         $action = $event['action'];
         $params = $event['params'];
-       $data = $event['form']->value()->toArray();
+        $data = $event['form']->value()->toArray();
         switch ($action) {
-            case 'sqlite':
+            case 'sqlite-insert':
+            $this->grav['debugger']->addMessage('in sql_insert');
                   $fields = '';
                   $values = '';
                   $nxt = false;
@@ -86,13 +87,43 @@ class SqlitePlugin extends Plugin
                   } catch ( \Exception $e ) {
                       $msg = $e->getMessage();
                       if ( stripos($msg, 'unique') !== false ) {
-                        $msg .= $grav['language']->translate(PLUGIN_SQLITE.UNIQUE_FIELD_ERROR);
+                        $msg .= $this->grav['language']->translate(['PLUGIN_SQLITE.UNIQUE_FIELD_ERROR']);
                       } else {
-                        $msg .= $grav['language']->translate(PLUGIN_SQLITE.OTHER_SQL_ERROR);
+                        $msg .= $this->grav['language']->translate(['PLUGIN_SQLITE.OTHER_SQL_ERROR']);
                       }
                       $this->grav->fireEvent('onFormValidationError', new Event([
                               'form'    => $event['form'],
                               'message' => $msg
+                      ]));
+                      $event->stopPropagation();
+                  }
+                  break;
+              case 'sql-update':
+                  if ( ! isset( $params['where'] ) ) {
+                    // where expression is mandatory, so fail if not set
+                    $this->grav->fireEvent('onFormValidationError', new Event([
+                            'form'    => $event['form'],
+                            'message' => $this->grav['language']->translate(['PLUGIN_SQLITE.UPDATE_WHERE'])
+                    ]));
+                    $event->stopPropagation();
+                    break;
+                  }
+                  $set = 'SET ';
+                  $nxt = false;
+                  foreach ( $data as $field => $value ) {
+                    $set .= ( $nxt ? ', ' : '') ;
+                    $set .= $field . '="' . $value . '"' ;
+                    $nxt = true;
+                  }
+                  $sql ="UPDATE {$params['table']} $set WHERE {$params['where']}";
+                  dump($sql);
+                  $db = $this->grav['sqlite']['db'];
+                  try {
+                    $db->exec($sql) ;
+                  } catch ( \Exception $e ) {
+                      $this->grav->fireEvent('onFormValidationError', new Event([
+                              'form'    => $event['form'],
+                              'message' => sprintf($this->grav['language']->translate(['PLUGIN_SQLITE.UPDATE_ERROR']),$e->getMessage())
                       ]));
                       $event->stopPropagation();
                   }

@@ -1,6 +1,6 @@
 # Sqlite Plugin
 
-The **Sqlite** Plugin is for [Grav CMS](http://github.com/getgrav/grav). The shortcode `[sql-table]` and the `sqlite` ***Form*** action are provided to interact with an ***Sqlite3*** database.
+The **Sqlite** Plugin is for [Grav CMS](http://github.com/getgrav/grav). The shortcode `[sql-table]` and the ***Form*** actions `sql-insert` and `sql-update`  are provided to interact with an ***Sqlite3*** database.
 
 ## Installation
 
@@ -55,7 +55,8 @@ shortcode-core:
 ## Usage
 A shortcode and a Form action are provided.
 1. `[sql-table]` to generate a table from data in the database
-2. `Form` action`sqlite` is used to move data from a form to the database
+2. the `sql-insert` action for a ***Form*** is used to move data from a form to the database.
+1. the `sql-update` action for a ***Form*** is used to update an existing row of data in the database.
 
 When the plugin is first initialised, it verifies that the database exists. If it does not exist, then every instance of the `[sql-table]` shortcode is replaced with an error message and the Form generates an error message when the submit button is pressed.
 
@@ -68,7 +69,14 @@ In the page content the shortcode is used as:
 
 The plugin then generates an html table with the headers as returned by the select stanza, and the body containing the row data.
 
-The `[sql-table]...[/sql-table]` stanza can be embedded in other shortcodes, such as  [ScrolledTableShortCodePlugin](https://github.com/finanalyst/scrolled-table-shortcode), or configured with the [Tablesorter](https://github.com/Perlkonig/grav-plugin-tablesorter) plugin.
+The SELECT stanza can be complex referring to multiple tables in the database. An SQLite3 query will return a table of rows with the same number of elements, which will fit into a simple HTML table.
+
+Since the data would normally be updated, it is recommended that the page header contains:
+```yaml
+cache-enabled: false
+```
+
+The `[sql-table]...[/sql-table]` stanza can be embedded in other shortcodes, such as  [ScrolledTableShortcode](https://github.com/finanalyst/grav-scrolled-table-shortcode) plugin, or configured with the [Tablesorter](https://github.com/Perlkonig/grav-plugin-tablesorter) plugin.
 
 #### Example
 Assuming that:
@@ -80,15 +88,15 @@ Assuming that:
   - `telephone`
   - `gender`  
 
-Then the following code and sql stanza (newlines for clarity only)
+Then the following code and sql stanza (standard SQLite3 allows new lines and indentation for clarity)
 ```md
 [sql-table]
 SELECT name, surname, telephone, gender
-FROM people
-LIMIT 15
+  FROM people
+  LIMIT 4
 [/sql-table]
 ```
-will be rendered as (white space for example only)
+will be rendered something like
 ```html
 <table>
   <thead>
@@ -100,12 +108,24 @@ will be rendered as (white space for example only)
     <tr>
       <td>xyz</td><td>qwe</td><td>1234</td><td>Male</td>
     </tr>
-    ...
+    <tr>
+      <td>xyz1</td><td>qwe</td><td>1234</td><td>Male</td>
+    </tr>
+    <tr>
+      <td>xyz2</td><td>qwe</td><td>1234</td><td>Male</td>
+    </tr>
+    <tr>
+      <td>xyz3</td><td>qwe</td><td>1234</td><td>Male</td>
+    </tr>
   </tbody>
 </table>
 ```
 #### Options
-The following options are allowed
+The following options are allowed:
+- class
+- id
+- hidden
+
 ##### class
  Provided so that a css class can be added to the table. Thus
 ```md
@@ -117,21 +137,34 @@ will be rendered as
   ...
 </table>
 ```
+##### id
+ Provided so that an `id` can be added to the table. Thus
+```md
+[sql-table id=SomeId]SELECT stanza[/sql-table]
+```
+will be rendered as
+```html
+<table id="SomeId">
+  ...
+</table>
+```
 ##### hidden
 If a list of column names is provided, then the column will not be displayed. The column names must be the same as the column names returned by the SQL stanza, eg.,
 ```md
 [sql-table hidden="id idnum"]SELECT row-id as id, Passport as idnum, name, surname, telephone from people
 [/sql-table]
 ```
->Caveat: the string of column names is parsed by looking for white space between column names.
-Consequently, the column names for the table may not contain whitespace.
+>Notes:
+1. Column names are matched using `\s+` or whitespace.   
+This means that the column heads must be a single word (including `_`). This can be done by using `AS` to rename column names in the `SELECT` statement. Since the column headers are to be hidden, it does not matter what they look like.  
+2. Shortcode parameters must be in double quotes `"..."` not single quotes `'...'`.
 
-Column hiding is accomplished  by adding a `style="display: none;"` to the relevant header `<th>` elements. Consequently, the data still exists in the HTML table, and so can be scrubbed.
+Column hiding is accomplished  by adding a `style="display: none;"` to the relevant `<th>` and `<td>` elements. Consequently, the data still exists in the HTML table, and so can be scrubbed or viewed by looking at the page source.
 
-However, the intent of this option is to make the data available for use by JS or Jquery functions, or for updating the SQL database. In this case, a row-id is needed, but usually it is irrelevant for the user.
+However, the intent of this option is to make the data available for use by JS or Jquery functions, or for updating the SQL database, but for it not to be immediately visible. For example, in order to update a row (a feature to be added), a row-id will be needed, but usually it is irrelevant for the user to see the row-id.
 
-### Form Action sqlite
-A GRAV form is created within the page as described by the GRAV documentation. However, the `process` list contains the word `sqlite`.
+### Form Action `sql-insert`
+A GRAV form is created within the page as described by the GRAV documentation. However, the `process` list contains the word `sql-insert`.
 
 #### Example
 In the page header, assuming the page is form.md
@@ -156,8 +189,9 @@ form:
           male: male
           female: female
       process:
-        - sqlite: # this is the crucial one
-            table: people # this must match the table
+        - sql-insert: # this is the crucial one
+            table: people # this must match the table the data is being added to
+        - redirect: showdata # this is optional (see note below)
       buttons:
         - type: submit
           value: Add person to database
@@ -167,24 +201,70 @@ form:
 ```
 When the submit button is pressed, the following stanza is sent to the database:
 ```sql
-INSERT INTO table (name, surname, telephone, gender) VALUES (...)
+INSERT INTO people (name, surname, telephone, gender) VALUES (...)
 ```
 
 The form plugin offers considerable flexibility for validating data before being sent to the database.
 
->NOTE: No further validation of the data is carried out by the plugin.
+>NOTE1: No further validation of the data is carried out by the plugin.
+
+In the example above, the process list has a redirect to another slug. This is optional. However, if the data is added correctly, it can be viewed using an `[sql-table]` shortcode with an appropriate `SELECT` stanza. The redirect action replaces the Form so that if, as recommended, the `reset` option is set to `true`, returning to the Form will set to default the fields, thus preventing inadvertent data duplication.
+
+If there is an error (non-unique data, or incorrect fields), the `redirect` action is short-circuited.
+
+### Form Action `sql-update`
+A GRAV form is created within the page as described by the GRAV documentation. However, the `process` list contains the word `sql-update`.
+
+#### Example
+In the page header, assuming the page is form.md
+```yaml
+form:
+    name: Input data
+    method: POST
+    fields:
+      - name: telephone
+        type: text
+        label: Telephone number of the person
+      - name: status
+        type: select
+        label: Club membership
+        options:
+          ordinary: Ordinary
+          VIP: VIP
+          Senior: Senior
+      process:
+        - sql-update: # this is the crucial one
+            table: people # this must match the table the data is being added to
+            where: ' row-id = "3" ' # a mandatory option. It is the full WHERE expression
+        - redirect: showdata # this is optional
+      buttons:
+        - type: submit
+          value: Update person to database
+        - type: reset
+          value: Reset
+      reset: true # this is advised to prevent the same data being added multiple times.
+```
+When the submit button is pressed, the following stanza is sent to the database:
+```sql
+UPDATE people
+  SET telephone = <telephone> ,
+          status = <status>
+  WHERE row-id = "3"
+```
+Here <...> is the value given in the ***Form*** for the relevant field.
+
+It is for the website designer to figure out how to construct the `where` option for the form.
 
 ## Security
-Security is an issue because a `sqlite` form allows a page user to modify an existing database, and therefore corrupt it - at the very least by adding unnecessary data.
+Security is an issue because a `sql-insert` and `sql-update` form actions allows a
+page user to modify an existing database, and therefore corrupt it - at the very least by adding unnecessary data.
 
-The website designer should therefore make sure that [sql-form] shortcodes are only available on Grav pages that are protected.
+The website designer should therefore make sure that Forms with `sql-insert` and `sql-update` actions are only available on Grav pages that are protected.
 
 For example, using the `Login` plugin, only users with certain privileges or belonging to certain groups can be allowed in.
 
 Alternatively, using the `Private` plugin, a password can be created for the page.
 
 ## To Do
-- Internationalise.
-- Allow for Column headings to be replaced with strings containing whitespace.
-- Make a `confirm` option for the Form interface so that data is confirmed before being sent to the database.
-- Create a structure for updating existing elements a database.
+- Internationalise. Add more languages to `langages.yaml`
+- Create a `confirm` option for the Form interface so that data is confirmed before being sent to the database.

@@ -27,7 +27,7 @@ class SqlTableShortcode extends Shortcode
           array_push($fields, $query->columnName($i));
         }
         $rows = array();
-        while ( $row = $query->fetchArray(SQLITE3_NUM) ) {
+        while ( $row = $query->fetchArray(SQLITE3_ASSOC) ) {
           array_push($rows,$row);
         }
         // find if there are hidden columns
@@ -40,7 +40,8 @@ class SqlTableShortcode extends Shortcode
             'fields' => $fields,
             'rows' => $rows,
             'hidden' => $hidden,
-            'class' => isset( $params['class']) ? $params['class'] : ''
+            'class' => isset( $params['class']) ? $params['class'] : '',
+            'id' => isset($params['id']) ? $param['id'] : ''
           ]);
         return $output;
       } catch( \Exception $e) {
