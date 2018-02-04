@@ -1,5 +1,5 @@
 name: Sqlite
-version: '0.1.0'
+version: '1.0.0'
 description: Plugin to select and insert into and sqlite3 database
 icon: database
 author:
