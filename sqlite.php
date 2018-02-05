@@ -68,10 +68,9 @@ class SqlitePlugin extends Plugin
         }
         $action = $event['action'];
         $params = $event['params'];
-        $data = $event['form']->value()->toArray();
         switch ($action) {
             case 'sqlite-insert':
-            $this->grav['debugger']->addMessage('in sql_insert');
+                  $data = $event['form']->value()->toArray();
                   $fields = '';
                   $values = '';
                   $nxt = false;
@@ -99,6 +98,7 @@ class SqlitePlugin extends Plugin
                   }
                   break;
               case 'sql-update':
+                  $data = $event['form']->value()->toArray();
                   if ( ! isset( $params['where'] ) ) {
                     // where expression is mandatory, so fail if not set
                     $this->grav->fireEvent('onFormValidationError', new Event([
@@ -116,7 +116,6 @@ class SqlitePlugin extends Plugin
                     $nxt = true;
                   }
                   $sql ="UPDATE {$params['table']} $set WHERE {$params['where']}";
-                  dump($sql);
                   $db = $this->grav['sqlite']['db'];
                   try {
                     $db->exec($sql) ;
