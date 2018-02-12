@@ -16,7 +16,7 @@ class SqlTableShortcode extends Shortcode
           ]);
       }
       // database exists
-      $stanza = preg_replace('/\<\/?p.*?\>/i','',$sc->getContent()); // remove <p> embedded by markdown
+      $stanza = preg_replace('/\<\/?p.*?\>|\`\`\`\n/i','',$sc->getContent()); // remove <p> embedded by markdown
       $params = $sc->getParameters();
       $db = $this->grav['sqlite']['db'];
       try {

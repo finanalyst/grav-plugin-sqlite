@@ -100,7 +100,7 @@ class SqlitePlugin extends Plugin
                   break;
               case 'sql-update':
                   $data = $form->value()->toArray();
-                  if ( ! isset( $params['where'] ) ) {
+                  if ( ! isset( $params['where'] )  and ! isset($data['where'])) {
                     // where expression is mandatory, so fail if not set
                     $this->grav->fireEvent('onFormValidationError', new Event([
                             'form'    => $event['form'],
@@ -108,6 +108,12 @@ class SqlitePlugin extends Plugin
                     ]));
                     $event->stopPropagation();
                     break;
+                  }if (isset($data['where'])) {
+                      // priority to where in form
+                      $where = $data['where'];
+                      unset($data['where']); // dont want it polluting UPDATE as a field
+                  } else {
+                      $where = $params['where'];
                   }
                   $set = 'SET ';
                   $nxt = false;
@@ -116,7 +122,8 @@ class SqlitePlugin extends Plugin
                     $set .= $field . '="' . $value . '"' ;
                     $nxt = true;
                   }
-                  $sql ="UPDATE {$params['table']} $set WHERE {$params['where']}";
+
+                  $sql ="UPDATE {$params['table']} $set WHERE $where";
                   $db = $this->grav['sqlite']['db'];
                   try {
                     $db->exec($sql) ;

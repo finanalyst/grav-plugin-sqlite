@@ -14,5 +14,5 @@ en:
     SQL_ERROR_1: SQL Error
     SQL_ERROR_2: The SQL statement between the shortcode, viz.
     SQL_ERROR_3: generates the error.
-    UPDATE_WHERE: A where expression is mandatory when using an "sql-update" Form action.
+    UPDATE_WHERE: A where expression is mandatory (either as a parameter or as a form field) when using an "sql-update" Form action.
     UPDATE_ERROR: The following UPDATE error was generated:<BR>%s

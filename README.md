@@ -232,10 +232,14 @@ form:
           ordinary: Ordinary
           VIP: VIP
           Senior: Senior
+      - name: where # a mandatory option (note lower case only). It is the full WHERE expression
+        type: hidden # this is a where FIELD
+        content: ' row-id = "3" ' # the single quotes are needed to ensure the double quotes are included
       process:
         - sql-update: # this is the crucial one
             table: people # this must match the table the data is being added to
-            where: ' row-id = "3" ' # a mandatory option. It is the full WHERE expression
+            where: ' row-id = "3" ' # a mandatory option. This is a process PARAMETER
+            # a where field takes precedence over a where parameter
         - redirect: showdata # this is optional
       buttons:
         - type: submit
@@ -253,7 +257,7 @@ UPDATE people
 ```
 Here <...> is the value given in the ***Form*** for the relevant field.
 
-It is for the website designer to figure out how to construct the `where` option for the form.
+It is for the website designer to figure out how to construct the `where` option (either by field or parameter) for the form.
 
 ## Security
 Security is an issue because a `sql-insert` and `sql-update` form actions allows a
