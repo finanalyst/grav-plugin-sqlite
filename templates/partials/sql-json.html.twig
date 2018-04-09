@@ -1,0 +1,9 @@
+[
+    {% for row in rows %}
+        {
+        {% for col,item in row %}
+            "{{col}}": {% if item matches '/^\s*[-+]?[0-9]+\\.?[0-9]+\s*$/' %} {{ item }} {% else %}"{{ item }}"{% endif %}{{ not loop.last ? ',' }}
+        {% endfor %}
+        }{{ not loop.last ? ',' }}
+    {% endfor %}
+]

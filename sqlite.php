@@ -108,7 +108,8 @@ class SqlitePlugin extends Plugin
                     ]));
                     $event->stopPropagation();
                     break;
-                  }if (isset($data['where'])) {
+                  }
+                  if (isset($data['where'])) {
                       // priority to where in form
                       $where = $data['where'];
                       unset($data['where']); // dont want it polluting UPDATE as a field

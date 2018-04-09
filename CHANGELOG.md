@@ -1,4 +1,4 @@
-# v1.0.2
+# v1.1.0
 ##  01/24/2018
 
 1. [*](#new)
@@ -8,3 +8,5 @@
     * refactor in case of zero data in form.
 3. [*](#minor)
     * Allow for `where` to be a Form Field as well as a Process parameters
+4. [*](#major)
+    * New sql option to provide json serialisation instead of HTML serialisation of data

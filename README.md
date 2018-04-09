@@ -54,7 +54,7 @@ shortcode-core:
 
 ## Usage
 A shortcode and a Form action are provided.
-1. `[sql-table]` to generate a table from data in the database
+1. `[sql-table]` to generate a table (or ***json*** string) from data in the database
 2. the `sql-insert` action for a ***Form*** is used to move data from a form to the database.
 1. the `sql-update` action for a ***Form*** is used to update an existing row of data in the database.
 
@@ -125,6 +125,7 @@ The following options are allowed:
 - class
 - id
 - hidden
+- json
 
 ##### class
  Provided so that a css class can be added to the table. Thus
@@ -162,6 +163,37 @@ This means that the column heads must be a single word (including `_`). This can
 Column hiding is accomplished  by adding a `style="display: none;"` to the relevant `<th>` and `<td>` elements. Consequently, the data still exists in the HTML table, and so can be scrubbed or viewed by looking at the page source.
 
 However, the intent of this option is to make the data available for use by JS or Jquery functions, or for updating the SQL database, but for it not to be immediately visible. For example, in order to update a row (a feature to be added), a row-id will be needed, but usually it is irrelevant for the user to see the row-id.
+
+##### json
+
+Sometimes data is required as a `json` string, eg., to include as data for other shortcodes, rather than as an **HTML** `<table>`.
+
+For this purpose, the json option is provided:
+```md
+[sql-table json]SELECT stanza[/sql-table]
+```
+
+The **json** string will be an array `[]` of hash elements `{}`, one hash for each row of the table.
+
+The keys of the hash are the names of the columns in the SELECT stanza. For example,
+```md
+[sql-table json]
+SELECT strftime('%H:%m',time,'unixepoch','localtime') as key, latitude as lat, longitude as lng
+FROM tracking
+WHERE id=1
+[/sql-table]
+```
+This assumes a table of latitude and longitude readings over time in unix seconds for units with a given id.
+
+This will be rendered by the `sqlite-plugin` as
+```md
+[
+{ "key": "20:10", "lat": 123.012, "lng": 22.1234},
+{ "key": "20:20", "lat": 123.546, "lng": 22.112}
+]
+```
+
+When this option is used, the values of the other options `class`, `id`, or `hidden` are ignored because they only have significance for an **HTML** `<table>`.
 
 ### Form Action `sql-insert`
 A GRAV form is created within the page as described by the GRAV documentation. However, the `process` list contains the word `sql-insert`.
