@@ -120,6 +120,21 @@ will be rendered something like
   </tbody>
 </table>
 ```
+It is also possible for the SELECT stanza in the xxx.md file to contain a Twig variable. For example:
+```md
+[sql-table]
+SELECT name, surname, telephone, gender
+  FROM people
+  LIMIT {{ userinfo.lines }}
+[/sql-table]
+```
+For this to work, Twig processing must be enabled, viz., in the page header there should be the line
+```Yaml
+process:
+    twig: true
+```
+
+
 #### Options
 The following options are allowed:
 - class
@@ -128,7 +143,7 @@ The following options are allowed:
 - json
 
 ##### class
- Provided so that a css class can be added to the table. Thus
+ Provided so that a `css` class can be added to the table. Thus
 ```md
 [sql-table class=SomeName]SELECT stanza[/sql-table]
 ```
@@ -270,7 +285,7 @@ form:
       process:
         - sql-update: # this is the crucial one
             table: people # this must match the table the data is being added to
-            where: ' row-id = "3" ' # a mandatory option. This is a process PARAMETER
+            where: ' row-id = "3" ' # an alternative to the where field.
             # a where field takes precedence over a where parameter
         - redirect: showdata # this is optional
       buttons:
@@ -280,6 +295,8 @@ form:
           value: Reset
       reset: true # this is advised to prevent the same data being added multiple times.
 ```
+> NOTE: It is mandatory to provide `where` data, either as a form field, or a process attribute.
+
 When the submit button is pressed, the following stanza is sent to the database:
 ```sql
 UPDATE people
@@ -289,8 +306,17 @@ UPDATE people
 ```
 Here <...> is the value given in the ***Form*** for the relevant field.
 
-It is for the website designer to figure out how to construct the `where` option (either by field or parameter) for the form.
+It is possible to include a Twig variable in the `WHERE` data, eg.,
+```Yaml
+form:
+    process:
+      - sql-update:
+          table: people
+          where: ' row-id = "{{ userinfo.userid }}" '
+```
+Then it is possible to use another mechanism, such as the `persistent-data` plugin, to arrange for a Twig variable to contain the necessary information.
 
+For this to work, Twig processing in headers needs to be set for the site.
 ## Security
 Security is an issue because a `sql-insert` and `sql-update` form actions allows a
 page user to modify an existing database, and therefore corrupt it - at the very least by adding unnecessary data.

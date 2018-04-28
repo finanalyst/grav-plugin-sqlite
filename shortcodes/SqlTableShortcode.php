@@ -17,7 +17,9 @@ class SqlTableShortcode extends Shortcode
       }
       // database exists
       $s = $sc->getContent();
-      $stanza = preg_replace('/\<\/?p.*?\>|\n/i',' ',$s); // remove <p> embedded by markdown
+      // process any twig variables in the SQL stanza
+      $s = $this->grav['twig']->processString($s);
+      $stanza = html_entity_decode(preg_replace('/\<\/?p.*?\>|\n/i',' ',$s)); // remove <p> embedded by markdown
       $params = $sc->getParameters();
       $db = $this->grav['sqlite']['db'];
       try {
@@ -54,7 +56,6 @@ class SqlTableShortcode extends Shortcode
                 'id' => isset($params['id']) ? $param['id'] : ''
               ]);
         }
-        $this->grav['debugger']->addMessage($output);
         return $output;
       } catch( \Exception $e) {
         return

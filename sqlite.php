@@ -116,6 +116,8 @@ class SqlitePlugin extends Plugin
                   } else {
                       $where = $params['where'];
                   }
+                  // allows for use of inpage twig
+                  $where = $this->grav['twig']->processString($where);
                   $set = 'SET ';
                   $nxt = false;
                   foreach ( $data as $field => $value ) {
