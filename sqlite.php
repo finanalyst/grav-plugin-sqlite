@@ -15,10 +15,7 @@ class SqlitePlugin extends Plugin
     public static function getSubscribedEvents()
     {
         return [
-            'onPluginsInitialized' => ['onPluginsInitialized', 0],
-            'onShortcodeHandlers' => ['onShortcodeHandlers', 0],
-            'onTwigTemplatePaths' => ['onTwigTemplatePaths',0],
-            'onFormProcessed' => ['onFormProcessed', 0]
+            'onPluginsInitialized' => ['onPluginsInitialized', 0]
         ];
     }
     public function onPluginsInitialized()
@@ -38,6 +35,11 @@ class SqlitePlugin extends Plugin
           $this->sqlite['error'] = "user://$route/$dbname";
         }
         $this->grav['sqlite'] = $this->sqlite;
+        $this->enable([
+            'onShortcodeHandlers' => ['onShortcodeHandlers', 0],
+            'onTwigTemplatePaths' => ['onTwigTemplatePaths',0],
+            'onFormProcessed' => ['onFormProcessed', 0]
+        ]);
     }
 
     public function onTwigTemplatePaths()
@@ -55,9 +57,6 @@ class SqlitePlugin extends Plugin
 
     public function onFormProcessed(Event $event)
     {
-        if (!$this->config->get('plugins.sqlite.enabled')) {
-            return;
-        }
         if ( isset($this->grav['sqlite']['error'])  && $this->grav['sqlite']['error'] ) {
           $this->grav->fireEvent('onFormValidationError', new Event([
                   'form'    => $event['form'],
@@ -70,12 +69,14 @@ class SqlitePlugin extends Plugin
         $params = $event['params'];
         $form = $event['form'];
         switch ($action) {
-            case 'sqlite-insert':
+            case 'sql-insert':
                   $data = $form->value()->toArray();
                   $fields = '';
                   $values = '';
                   $nxt = false;
                   foreach ( $data as $field => $value ) {
+                    // remove fields associated with Form plugins
+                    if ( preg_match('/^\\_|form\\-nonce/', $field ) ) continue; // next iteration if error (false) in match, or match succeeds.
                     $fields .= ( $nxt ? ',' : '') . $field;
                     $values .= ( $nxt ? ',' : '' ) . '"' . $value . '"' ;
                     $nxt = true;

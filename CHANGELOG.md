@@ -1,5 +1,21 @@
-# v1.2.1
+# v1.2.2
 ##  5/05/2018
+1. [*](#bug and enhancement)
+    * Process `sqlite-insert` corrected to `sql-insert`
+    * Removed fields provided by `Form` plugin, viz. `_xxx` & `form-nonce`
+
+# v1.2.1
+##  5 May 2018
+1. [*](#minor)
+        * error in translate call
+
+#v1.2.0
+##  28 April 2018
+1. [*](#major )
+    * Allow for Twig variables to be used in SELECT stanza in shortcode, and in 'where' field of UPDATE Form process.
+
+# v1.0.0 - v1.2.0
+##  < 28 April 2018
 
 1. [*](#new)
     * Initial work
@@ -10,7 +26,3 @@
     * Allow for `where` to be a Form Field as well as a Process parameters
 4. [*](#major)
     * New sql option to provide json serialisation instead of HTML serialisation of data
-5. [*](#major 28 April 2018)
-    * Allow for Twig variables to be used in SELECT stanza in shortcode, and in 'where' field of UPDATE Form process.
-6. [*](#minor 5 May 2018)
-    * error in translate call
