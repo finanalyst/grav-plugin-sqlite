@@ -1,5 +1,5 @@
-# v1.2.0
-##  01/24/2018
+# v1.2.1
+##  5/05/2018
 
 1. [*](#new)
     * Initial work
@@ -12,3 +12,5 @@
     * New sql option to provide json serialisation instead of HTML serialisation of data
 5. [*](#major 28 April 2018)
     * Allow for Twig variables to be used in SELECT stanza in shortcode, and in 'where' field of UPDATE Form process.
+6. [*](#minor 5 May 2018)
+    * error in translate call

@@ -61,7 +61,7 @@ class SqlitePlugin extends Plugin
         if ( isset($this->grav['sqlite']['error'])  && $this->grav['sqlite']['error'] ) {
           $this->grav->fireEvent('onFormValidationError', new Event([
                   'form'    => $event['form'],
-                  'message' => sprintf($grav['language']->translate(['PLUGIN_SQLITE.DATABASE_ERROR']), $this->grav['sqlite']['error'])
+                  'message' => sprintf($this->grav['language']->translate(['PLUGIN_SQLITE.DATABASE_ERROR']), $this->grav['sqlite']['error'])
           ]));
           $event->stopPropagation();
           return;
