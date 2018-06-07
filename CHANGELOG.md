@@ -1,3 +1,8 @@
+# v1.2.3
+## 7 June 2018
+1. [](#update)
+    * Add shortcode dependency to blueprints
+    
 # v1.2.2
 ##  5/05/2018
 1. [*](#bug and enhancement)
