@@ -1,10 +1,10 @@
 name: Sqlite
-version: '1.2.4'
-description: Plugin to select and insert into and sqlite3 database
+version: '1.3.0'
+description: Plugin to select, update and insert into an sqlite3 database
 icon: database
 author:
-  name: Richard N Hainsworth
-  email: rnhainsworth@gmail.com
+    name: Richard N Hainsworth
+    email: rnhainsworth@gmail.com
 homepage: https://github.com/finanalyst/grav-plugin-sqlite
 bugs: https://github.com/finanalyst/grav-plugin-sqlite/issues
 keywords: [sqlite, grav, plugin]
@@ -12,17 +12,28 @@ readme: https://github.com/finanalyst/grav-plugin-sqlite/README.md
 license: MIT
 
 dependencies:
-  - shortcode-core
+    - shortcode-core
 
 form:
-  fields:
-    database_name:
-      type: text
-      default: db.sqlite3
-      label: PLUGIN_SQLITE.DATABASE_NAME
-      help: PLUGIN_SQLITE.DATABASE_NAME_HELP
-    database_route:
-      type: text
-      default: data
-      label: PLUGIN_SQLITE.DATABASE_ROUTE
-      help: PLUGIN_SQLITE.DATABASE_ROUTE_HELP
+    fields:
+        database_name:
+            type: text
+            default: db.sqlite3
+            label: PLUGIN_SQLITE.DATABASE_NAME
+            help: PLUGIN_SQLITE.DATABASE_NAME_HELP
+        database_route:
+            type: text
+            default: data
+            label: PLUGIN_SQLITE.DATABASE_ROUTE
+            help: PLUGIN_SQLITE.DATABASE_ROUTE_HELP
+        error_logging:
+            type: toggle
+            highlight: 0
+            default: 0
+            options:
+                1: Enabled
+                0: Disabled
+            validate:
+                type: bool
+            label: PLUGIN_SQLITE.ERROR_LOGGING
+            help: PLUGIN_SQLITE.ERROR_LOGGING_HELP

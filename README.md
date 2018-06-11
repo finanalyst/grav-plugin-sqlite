@@ -38,12 +38,16 @@ Here is the default configuration and an explanation of available options:
 enabled: true
 database_route: data
 database_name: db.sqlite3
+error_logging: false
 ```
 - `enabled` turns on the plugin for the whole site. If `false`, then making it active on a page will have no effect.  
 - `database_route` is the Grav route (relative to the 'user' subdirectory) to the location of the `SQLite3` database.  
 - `database_name` is the full name (typically with the extension .sqlite3) of the database file. It is the responsibility of the site developer/maintainer to create the database.
+- `error_logging` when false, nothing extra happens. When `true`, the SQL errors are logged to the file `sqlite_errors.txt` in the directory given by `database_route`. If however there is an error in setting `database_route`,
+then the directory is `user/data`
 
->NOTE: The database must exist.
+>NOTE: The database must exist. If it does not, then an error is generated.    
+`error_logging` should not be used in production settings as it writes to the hard drive, slowing performance.
 
 ### Per page configuration
 Shortcodes can be enabled separately using the `shortcode-core` configuration. To disable shortcodes being used on all pages, but only used on selected pages, configure the shortcode-core plugin inside the Admin panel with `enabled=true` and `active=false`. Then on each page where shortcodes are used, include in the front section of the page:
@@ -59,6 +63,10 @@ A shortcode and a Form action are provided.
 1. the `sql-update` action for a ***Form*** is used to update an existing row of data in the database.
 
 When the plugin is first initialised, it verifies that the database exists. If it does not exist, then every instance of the `[sql-table]` shortcode is replaced with an error message and the Form generates an error message when the submit button is pressed.
+
+>NOTE: Although as many errors as possible are trapped, it should be remembered that GRAV uses redirects
+extensively, eg., in login forms or sequential forms, which means the error messages may be overwritten. If
+this happens, then set `error_logging` to **true** whilst debugging.
 
 ### [sql-table] Shortcode
 
@@ -133,7 +141,6 @@ For this to work, Twig processing must be enabled, viz., in the page header ther
 process:
     twig: true
 ```
-
 
 #### Options
 The following options are allowed:
@@ -322,7 +329,7 @@ For this to work, Twig processing in headers needs to be set for the site.
 The following fields are defined for these two **Form** processes:
 
 1. `table` - This is mandatory, and is the table to which the sql stanza is applied.
-1. `where` - This is mandatory for `sql-update` & optional for `sql-insert` (the string `WHERE 1` is appended by default).
+1. `where` - This is mandatory for `sql-update` & ignored for `sql-insert`.
 1. `ignore` - This is optional for both. It is followed by an array of field names that are not included in the stanza. Eg.
 ```yaml
 form:
@@ -345,4 +352,3 @@ Alternatively, using the `Private` plugin, a password can be created for the pag
 
 ## To Do
 - Internationalise. Add more languages to `langages.yaml`
-- Create a `confirm` option for the Form interface so that data is confirmed before being sent to the database.

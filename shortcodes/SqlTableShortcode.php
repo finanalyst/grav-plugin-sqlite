@@ -1,6 +1,7 @@
 <?php
 namespace Grav\Plugin\Shortcodes;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
+use RocketTheme\Toolbox\File\File;
 use SQLite3;
 
 class SqlTableShortcode extends Shortcode
@@ -9,6 +10,9 @@ class SqlTableShortcode extends Shortcode
   {
     $this->shortcode->getHandlers()->add('sql-table', function(ShortcodeInterface $sc) {
       if ( isset($this->grav['sqlite']['error'])  && $this->grav['sqlite']['error'] ) {
+          if ($this->grav['sqlite']['logging']) {
+              $this->log_error($this->grav['sqlite']['error']);
+          }
         return
           $this->twig->processTemplate(
             'partials/sql-db-error.html.twig',
@@ -58,14 +62,28 @@ class SqlTableShortcode extends Shortcode
         }
         return $output;
       } catch( \Exception $e) {
-        return
-          $this->twig->processTemplate(
-            'partials/sql-sql-error.html.twig',
-            [
-              'message' =>  $e->getMessage(),
-              'content' => $stanza
-          ]);
-      }
-    });
-  }
+          if ($this->grav['sqlite']['logging']) {
+              $this->log_error('message: ' . $e->getMessage() . "\ncontent: $stanza");
+          }
+            return
+              $this->twig->processTemplate(
+                'partials/sql-sql-error.html.twig',
+                [
+                  'message' =>  $e->getMessage(),
+                  'content' => $stanza
+              ]);
+          }
+        });
+    }
+
+    public function log_error(String $msg) {
+        $path = $this->grav['sqlite']['path'] . 'sqlite_errors.txt';
+        $datafh = File::instance($path);
+        if ( file_exists($path) ) {
+            $datafh->save($datafh->content() . "\n" . $msg);
+        } else {
+            $datafh->save($msg);
+            chmod($path, 0666);
+        }
+    }
 }

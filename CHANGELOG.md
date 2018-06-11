@@ -1,8 +1,8 @@
-# v1.2.4
-## 10 June 2018
-1. [](#bugfix)
-    * Allow for WHERE to be optional in `sql-insert`, but set to `WHERE = 1` when not explicitly set.
+# v1.3.0
+## 11 June 2018
+1. [](#enhancement)
     * Add `ignore` field in `sql-insert` and `sql-update`
+    * Add `error_logging` configuration option, so that SQL errors are written to hard drive
 
 # v1.2.3
 ## 7 June 2018
