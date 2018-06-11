@@ -71,6 +71,9 @@ class SqlitePlugin extends Plugin
         switch ($action) {
             case 'sql-insert':
                   $data = $form->value()->toArray();
+                  if ( isset($params['ignore'])) {
+                      foreach ( $params['ignore'] as $k ) unset( $data[$k] );
+                  }
                   $fields = '';
                   $values = '';
                   $nxt = false;
@@ -81,7 +84,24 @@ class SqlitePlugin extends Plugin
                     $values .= ( $nxt ? ',' : '' ) . '"' . $value . '"' ;
                     $nxt = true;
                   }
-                  $sql ="INSERT INTO {$params['table']} ( $fields ) VALUES ( $values )";
+                  $where = '1'; // default
+                  if (isset($data['where'])) {
+                      // priority to where in form
+                      $where = $data['where'];
+                      unset($data['where']); // dont want it polluting UPDATE as a field
+                  } elseif (isset($params['where'])) { // where is optional for insert, so skip if not set. Then where=1
+                      $where = $params['where'];
+                  }
+                  // allows for use of inpage twig
+                  $where = $this->grav['twig']->processString($where);
+                  $set = 'SET ';
+                  $nxt = false;
+                  foreach ( $data as $field => $value ) {
+                    $set .= ( $nxt ? ', ' : '') ;
+                    $set .= $field . '="' . $value . '"' ;
+                    $nxt = true;
+                  }
+                  $sql ="INSERT INTO {$params['table']} ( $fields ) VALUES ( $values ) WHERE $where";
                   $db = $this->grav['sqlite']['db'];
                   try {
                     $db->exec($sql) ;
@@ -90,8 +110,8 @@ class SqlitePlugin extends Plugin
                       if ( stripos($msg, 'unique') !== false ) {
                         $msg .= $this->grav['language']->translate(['PLUGIN_SQLITE.UNIQUE_FIELD_ERROR']);
                       } else {
-                        $msg .= $this->grav['language']->translate(['PLUGIN_SQLITE.OTHER_SQL_ERROR']);
-                      }
+                        $msg .= $this->grav['language']->translate(['PLUGIN_SQLITE.OTHER_SQL_ERROR']) . "<BR>$sql";
+                    }
                       $this->grav->fireEvent('onFormValidationError', new Event([
                               'form'    => $event['form'],
                               'message' => $msg
@@ -101,6 +121,9 @@ class SqlitePlugin extends Plugin
                   break;
               case 'sql-update':
                   $data = $form->value()->toArray();
+                  if ( isset($params['ignore']) ) {
+                      foreach ( $params['ignore'] as $k ) unset( $data[$k] );
+                  }
                   if ( ! isset( $params['where'] )  and ! isset($data['where'])) {
                     // where expression is mandatory, so fail if not set
                     $this->grav->fireEvent('onFormValidationError', new Event([

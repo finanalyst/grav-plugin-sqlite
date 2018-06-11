@@ -317,6 +317,22 @@ form:
 Then it is possible to use another mechanism, such as the `persistent-data` plugin, to arrange for a Twig variable to contain the necessary information.
 
 For this to work, Twig processing in headers needs to be set for the site.
+
+## Fields for `sql-update` & `sql-insert`
+The following fields are defined for these two **Form** processes:
+
+1. `table` - This is mandatory, and is the table to which the sql stanza is applied.
+1. `where` - This is mandatory for `sql-update` & optional for `sql-insert` (the string `WHERE 1` is appended by default).
+1. `ignore` - This is optional for both. It is followed by an array of field names that are not included in the stanza. Eg.
+```yaml
+form:
+    process:
+        - sql-insert:
+            table: people
+            ignore:
+                - status
+```
+
 ## Security
 Security is an issue because a `sql-insert` and `sql-update` form actions allows a
 page user to modify an existing database, and therefore corrupt it - at the very least by adding unnecessary data.

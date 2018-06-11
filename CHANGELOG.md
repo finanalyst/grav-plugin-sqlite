@@ -1,8 +1,14 @@
+# v1.2.4
+## 10 June 2018
+1. [](#bugfix)
+    * Allow for WHERE to be optional in `sql-insert`, but set to `WHERE = 1` when not explicitly set.
+    * Add `ignore` field in `sql-insert` and `sql-update`
+
 # v1.2.3
 ## 7 June 2018
 1. [](#update)
     * Add shortcode dependency to blueprints
-    
+
 # v1.2.2
 ##  5/05/2018
 1. [*](#bug and enhancement)
