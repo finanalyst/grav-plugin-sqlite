@@ -1,3 +1,13 @@
+# v1.4.0
+## 23 June 2018
+1. [](#enhancement)
+    * More logging options, allowing for the SELECT, INSERT and UPDATE stanzas (in addition to Errors)
+    to be trapped.
+    * Append the logged data to the directory `user/data/sqlite` as a 'log.txt' file
+        * This allows an Administrator to view the data from within the Admin panel using the DataManager plugin.
+2. [](#change of configuration)
+    * The default configuration for the placement of the sqlite3 database is now `user/data/sqlite`
+
 # v1.3.0
 ## 11 June 2018
 1. [](#enhancement)

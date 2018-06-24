@@ -1,5 +1,5 @@
 name: Sqlite
-version: '1.3.0'
+version: '1.4.0'
 description: Plugin to select, update and insert into an sqlite3 database
 icon: database
 author:
@@ -26,7 +26,7 @@ form:
             default: data
             label: PLUGIN_SQLITE.DATABASE_ROUTE
             help: PLUGIN_SQLITE.DATABASE_ROUTE_HELP
-        error_logging:
+        logging:
             type: toggle
             highlight: 0
             default: 0
@@ -35,5 +35,68 @@ form:
                 0: Disabled
             validate:
                 type: bool
-            label: PLUGIN_SQLITE.ERROR_LOGGING
-            help: PLUGIN_SQLITE.ERROR_LOGGING_HELP
+            label: PLUGIN_SQLITE.LOGGING
+            help: PLUGIN_SQLITE.LOGGING_HELP
+        log_check:
+            type: conditional
+            condition: config.plugins.sqlite.logging
+            fields:
+                all_logging:
+                    type: toggle
+                    highlight: 0
+                    default: 0
+                    options:
+                        1: Enabled
+                        0: Disabled
+                    validate:
+                        type: bool
+                    label: PLUGIN_SQLITE.ALL_LOGGING
+                    help: PLUGIN_SQLITE.ALL_LOGGING_HELP
+        discrete_logging:
+            type: conditional
+            condition: "config.plugins.sqlite.logging and not config.plugins.sqlite.all_logging "
+            fields:
+                error_logging:
+                    type: toggle
+                    highlight: 0
+                    default: 0
+                    options:
+                        1: Enabled
+                        0: Disabled
+                    validate:
+                        type: bool
+                    label: PLUGIN_SQLITE.ERROR_LOGGING
+                    help: PLUGIN_SQLITE.ERROR_LOGGING_HELP
+                select_logging:
+                    type: toggle
+                    highlight: 0
+                    default: 0
+                    options:
+                        1: Enabled
+                        0: Disabled
+                    validate:
+                        type: bool
+                    label: PLUGIN_SQLITE.SELECT_LOGGING
+                    help: PLUGIN_SQLITE.SELECT_LOGGING_HELP
+                insert_logging:
+                    type: toggle
+                    highlight: 0
+                    default: 0
+                    options:
+                        1: Enabled
+                        0: Disabled
+                    validate:
+                        type: bool
+                    label: PLUGIN_SQLITE.INSERT_LOGGING
+                    help: PLUGIN_SQLITE.INSERT_LOGGING_HELP
+                update_logging:
+                    type: toggle
+                    highlight: 0
+                    default: 0
+                    options:
+                        1: Enabled
+                        0: Disabled
+                    validate:
+                        type: bool
+                    label: PLUGIN_SQLITE.UPDATE_LOGGING
+                    help: PLUGIN_SQLITE.UPDATE_LOGGING_HELP

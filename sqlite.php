@@ -6,12 +6,15 @@ use RocketTheme\Toolbox\Event\Event;
 use RocketTheme\Toolbox\File\File;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
 use SQLite3;
+use ReflectionProperty;
 
 class SqlitePlugin extends Plugin
 {
-    protected $handlers;
-    protected $assets;
     protected $sqlite;
+    const ERROR = 2;  // binary flags for each log type
+    const SELECT = 4;
+    const INSERT = 8;
+    const UPDATE = 16;
 
     public static function getSubscribedEvents()
     {
@@ -29,8 +32,15 @@ class SqlitePlugin extends Plugin
         $dbname = $this->config->get('plugins.sqlite.database_name');
         $path = $this->grav['locator']->findResource("user://$route", true);
         // path is also used for error logging, so there must be a valid route in case user supplied route fails.
-        $this->sqlite['path'] = $path?: $this->grav['locator']->findResource("user://data", true);
-        $this->sqlite['logging'] = $this->config->get('plugins.sqlite.error_logging');
+        $this->sqlite['path'] = $path?: $this->grav['locator']->findResource("user://data/sqlite", true);
+        $this->sqlite['logging'] = $this->config->get('plugins.sqlite.logging') * // is either 0 or 1
+                                            ( $this->config->get('plugins.sqlite.all_logging') ? (self::ERROR+self::SELECT+self::INSERT+self::UPDATE)
+                                                : ( $this->config->get('plugins.sqlite.error_logging') * self::ERROR
+                                                    + $this->config->get('plugins.sqlite.select_logging') * self::SELECT
+                                                    + $this->config->get('plugins.sqlite.insert_logging') * self::INSERT
+                                                    + $this->config->get('plugins.sqlite.update_logging') * self::UPDATE
+                                                )
+                                            );
         $dbloc = $path . DS . $dbname;
         if ( file_exists($dbloc) ) {
             $this->sqlite['db'] = new SQLite3($dbloc);
@@ -62,15 +72,13 @@ class SqlitePlugin extends Plugin
     public function onFormProcessed(Event $event)
     {
         if ( isset($this->grav['sqlite']['error'])  && $this->grav['sqlite']['error'] ) {
-            if ($this->grav['sqlite']['logging']) {
-                $this->log_error($this->grav['sqlite']['error']);
-            }
-          $this->grav->fireEvent('onFormValidationError', new Event([
+            $this->log(self::ERROR,$this->grav['sqlite']['error']);
+            $this->grav->fireEvent('onFormValidationError', new Event([
                   'form'    => $event['form'],
                   'message' => sprintf($this->grav['language']->translate(['PLUGIN_SQLITE.DATABASE_ERROR']), $this->grav['sqlite']['error'])
-          ]));
-          $event->stopPropagation();
-          return;
+            ]));
+            $event->stopPropagation();
+            return;
         }
         $action = $event['action'];
         $params = $event['params'];
@@ -97,11 +105,12 @@ class SqlitePlugin extends Plugin
                   $set = 'SET ';
                   $nxt = false;
                   foreach ( $data as $field => $value ) {
-                    $set .= ( $nxt ? ', ' : '') ;
-                    $set .= $field . '="' . $value . '"' ;
-                    $nxt = true;
+                        $set .= ( $nxt ? ', ' : '') ;
+                        $set .= $field . '="' . $value . '"' ;
+                        $nxt = true;
                   }
                   $sql ="INSERT INTO {$params['table']} ( $fields ) VALUES ( $values )";
+                  $this->log(self::INSERT,$sql);
                   $db = $this->grav['sqlite']['db'];
                   try {
                     $db->exec($sql) ;
@@ -112,9 +121,7 @@ class SqlitePlugin extends Plugin
                       } else {
                         $msg .= $this->grav['language']->translate(['PLUGIN_SQLITE.OTHER_SQL_ERROR']) . "<BR>$sql";
                     }
-                    if ($this->grav['sqlite']['logging']) {
-                        $this->log_error($msg);
-                    }
+                    $this->log(self::ERROR,$msg);
                     $this->grav->fireEvent('onFormValidationError', new Event([
                               'form'    => $event['form'],
                               'message' => $msg
@@ -129,9 +136,7 @@ class SqlitePlugin extends Plugin
                   }
                   if ( ! isset( $params['where'] )  and ! isset($data['where'])) {
                     // where expression is mandatory, so fail if not set
-                    if ($this->grav['sqlite']['logging']) {
-                        $this->log_error($this->grav['language']->translate(['PLUGIN_SQLITE.UPDATE_WHERE']));
-                    }
+                    $this->log(self::ERROR,$this->grav['language']->translate(['PLUGIN_SQLITE.UPDATE_WHERE']));
                     $this->grav->fireEvent('onFormValidationError', new Event([
                             'form'    => $event['form'],
                             'message' => $this->grav['language']->translate(['PLUGIN_SQLITE.UPDATE_WHERE'])
@@ -155,15 +160,13 @@ class SqlitePlugin extends Plugin
                         $set .= $field . '="' . $value . '"' ;
                         $nxt = true;
                   }
-
                   $sql ="UPDATE {$params['table']} $set WHERE $where";
+                  $this->log(self::UPDATE,$sql);
                   $db = $this->grav['sqlite']['db'];
                   try {
                     $db->exec($sql) ;
                   } catch ( \Exception $e ) {
-                      if ($this->grav['sqlite']['logging']) {
-                          $this->log_error(sprintf($this->grav['language']->translate(['PLUGIN_SQLITE.UPDATE_ERROR']),$e->getMessage()));
-                      }
+                      $this->log(self::ERROR,sprintf($this->grav['language']->translate(['PLUGIN_SQLITE.UPDATE_ERROR']),$e->getMessage()));
                       $this->grav->fireEvent('onFormValidationError', new Event([
                               'form'    => $event['form'],
                               'message' => sprintf($this->grav['language']->translate(['PLUGIN_SQLITE.UPDATE_ERROR']),$e->getMessage())
@@ -174,14 +177,22 @@ class SqlitePlugin extends Plugin
           }
     }
 
-    public function log_error(String $msg) {
-        $path = $this->grav['sqlite']['path'] . 'sqlite_errors.txt';
+    public function log($type, $msg) {
+        $log_val =$this->grav['sqlite']['logging'];
+        if ( $log_val == 0 ) return;
+
+        $path = $this->grav['sqlite']['path'] . DS . 'sqlite.html';
         $datafh = File::instance($path);
-        if ( file_exists($path) ) {
-            $datafh->save($datafh->content() . "\n" . $msg);
-        } else {
-            $datafh->save($msg);
-            chmod($path, 0666);
+        if (   ($log_val & self::ERROR) && ($type & self::ERROR)
+            || ($log_val & self::INSERT) && ($type & self::INSERT)
+            || ($log_val & self::UPDATE) && ($type & self::UPDATE)
+        ) {
+            if ( file_exists($path) ) {
+                $datafh->save($datafh->content() . '<br><span style="color:blue">' . date('Y-m-d:H:i') . '</span>: '  . $msg);
+            } else {
+                $datafh->save('<span style="color:blue">' . date('Y-m-d:H:i') . '</span>: ' . $msg);
+                chmod($path, 0666);
+            }
         }
     }
 }

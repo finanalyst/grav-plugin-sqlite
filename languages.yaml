@@ -16,5 +16,15 @@ en:
         SQL_ERROR_3: generates the error.
         UPDATE_WHERE: A where expression is mandatory (either as a parameter or as a form field) when using an "sql-update" Form action.
         UPDATE_ERROR: The following UPDATE error was generated:<BR>%s
-        ERROR_LOGGING: Turn on Logging. (Not for production!!)
-        ERROR_LOGGING_HELP: Log file is saved when an error is detected in DATABASE_ROUTE, or /user/data if former fails.
+        LOGGING: Turn on Logging. (Not for production!!)
+        LOGGING_HELP: Log file is appended when an error is detected in DATABASE_ROUTE, or /user/data if former fails.
+        ALL_LOGGING: Turn on All Logging.
+        ALL_LOGGING_HELP: Log file is appended when an error is detected in DATABASE_ROUTE, or /user/data if former fails.
+        ERROR_LOGGING: Turn on Error Logging.
+        ERROR_LOGGING_HELP: Log file is appended when an error is detected in DATABASE_ROUTE, or /user/data if former fails.
+        SELECT_LOGGING: Turn on Select Logging.
+        SELECT_LOGGING_HELP: Log file is appended when a SELECT stanza is sent to database.
+        INSERT_LOGGING: Turn on Insert Logging.
+        INSERT_LOGGING_HELP: Log file is appended when an INSERT stanza is sent to database.
+        UPDATE_LOGGING: Turn on Update Logging.
+        UPDATE_LOGGING_HELP: Log file is appended when an UPDATE stanza is sent to database.

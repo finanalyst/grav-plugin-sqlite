@@ -27,6 +27,8 @@ You should now have all the plugin files under
 and [Problems](https://github.com/getgrav/grav-plugin-problems) to operate.  
 The plugin also requires that the **SQLite3** extension is available with the version of php operating on your site.  
 
+### Database Installation
+An adminstrator must create a directory for the database and place within it the *sqlite3* database file. It is recommended that the directory is `user/data/sqlite` (see configuration).
 
 ## Configuration
 
@@ -36,18 +38,32 @@ Here is the default configuration and an explanation of available options:
 
 ```yaml
 enabled: true
-database_route: data
+database_route: data/sqlite
 database_name: db.sqlite3
-error_logging: false
+logging: false
+all_logging: false # this option only becomes active when logging is True
+error_logging: false # this option only becomes active is False
+select_logging: false
+insert_logging: false
+update_logging: false
 ```
 - `enabled` turns on the plugin for the whole site. If `false`, then making it active on a page will have no effect.  
 - `database_route` is the Grav route (relative to the 'user' subdirectory) to the location of the `SQLite3` database.  
 - `database_name` is the full name (typically with the extension .sqlite3) of the database file. It is the responsibility of the site developer/maintainer to create the database.
-- `error_logging` when false, nothing extra happens. When `true`, the SQL errors are logged to the file `sqlite_errors.txt` in the directory given by `database_route`. If however there is an error in setting `database_route`,
-then the directory is `user/data`
+- `logging` when false, nothing extra happens. When `true`, SQL related data is logged to a file called `sqlite.txt` in the directory given by `database_route`. If however there is an error in setting `database_route`,
+then the directory is `user/data/sqlite`.
+
+>SUGGESTION: If the DataManager plugin is installed and the default route is retained, then the SQL logs can be viewed
+from the Admin panel.
+
+- `all_logging` only become active when `logging` is enabled. If true, then all stanzas and errors are recorded.
+- `error_logging` only becomes active when `logging` is enabled and `all_logging` is not enabled.
+- `select_logging` only becomes active when `logging` is enabled and `all_logging` is not enabled.
+- `insert_logging` only becomes active when `logging` is enabled and `all_logging` is not enabled.
+- `update_logging` only becomes active when `logging` is enabled and `all_logging` is not enabled.
 
 >NOTE: The database must exist. If it does not, then an error is generated.    
-`error_logging` should not be used in production settings as it writes to the hard drive, slowing performance.
+`logging` should not be used in production settings as it writes to the hard drive, slowing performance.
 
 ### Per page configuration
 Shortcodes can be enabled separately using the `shortcode-core` configuration. To disable shortcodes being used on all pages, but only used on selected pages, configure the shortcode-core plugin inside the Admin panel with `enabled=true` and `active=false`. Then on each page where shortcodes are used, include in the front section of the page:
