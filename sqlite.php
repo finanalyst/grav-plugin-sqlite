@@ -41,6 +41,7 @@ class SqlitePlugin extends Plugin
                                                     + $this->config->get('plugins.sqlite.update_logging') * self::UPDATE
                                                 )
                                             );
+        $this->sqlite['extraSecurity'] = $this->config->get('plugins.sqlite.extra_security');
         $dbloc = $path . DS . $dbname;
         if ( file_exists($dbloc) ) {
             $this->sqlite['db'] = new SQLite3($dbloc);
@@ -52,21 +53,27 @@ class SqlitePlugin extends Plugin
         $this->enable([
             'onShortcodeHandlers' => ['onShortcodeHandlers', 0],
             'onTwigTemplatePaths' => ['onTwigTemplatePaths',0],
-            'onFormProcessed' => ['onFormProcessed', 0]
+            'onFormProcessed' => ['onFormProcessed', 0],
+            'onPageContentRaw' => ['onPageContentRaw', 0]
         ]);
     }
 
-    public function onTwigTemplatePaths()
-    {
-        $this->grav['twig']->twig_paths[] = __DIR__ . '/templates';
-    }
-    /**
-     * Initialize configuration
-     * @param Event $e
-     */
-    public function onShortcodeHandlers(Event $e)
-    {
-        $this->grav['shortcode']->registerAllShortcodes(__DIR__.'/shortcodes');
+    public function onPageContentRaw() {
+        // Not called if page cached.
+        // Don't proceed if we are in the admin plugin
+        if ($this->isAdmin()) {
+            $this->active = false;
+            return;
+        }
+        if ( ! $this->sqlite['extraSecurity'] ) return; // only  continue if extraSecurity is enabled
+        $page = $this->grav['page'];
+        // is there explicit permission for this page?
+        if ( $page->header()->{'sqliteSelect'} !== 'allow' ) return;
+        // extra security is on, so change every occurence of  '[sql' to '[sql-sec'
+        $raw = $page->getRawContent();
+        $processed = str_replace( [ '[sql' , '[/sql' ], [ '[sqlSEC' , '[/sqlSEC' ], $raw );
+        $page->setRawContent( $processed );
+        return;
     }
 
     public function onFormProcessed(Event $event)
@@ -177,6 +184,20 @@ class SqlitePlugin extends Plugin
           }
     }
 
+    public function onTwigTemplatePaths()
+    {
+        $this->grav['twig']->twig_paths[] = __DIR__ . '/templates';
+    }
+
+    /**
+     * Initialize configuration
+     * @param Event $e
+     */
+    public function onShortcodeHandlers(Event $e)
+    {
+        $this->grav['shortcode']->registerAllShortcodes(__DIR__.'/shortcodes');
+    }
+
     public function log($type, $msg) {
         $log_val =$this->grav['sqlite']['logging'];
         if ( $log_val == 0 ) return;
@@ -191,7 +212,7 @@ class SqlitePlugin extends Plugin
                 $datafh->save($datafh->content() . '<br><span style="color:blue">' . date('Y-m-d:H:i') . '</span>: '  . $msg);
             } else {
                 $datafh->save('<span style="color:blue">' . date('Y-m-d:H:i') . '</span>: ' . $msg);
-                chmod($path, 0666);
+                chmod($path, 0664);
             }
         }
     }

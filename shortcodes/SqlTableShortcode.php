@@ -10,14 +10,15 @@ class SqlTableShortcode extends Shortcode
     const SELECT = 4;
     public function init()
     {
-        $this->shortcode->getHandlers()->add('sql-table', function(ShortcodeInterface $sc) {
+        $tagName = $this->grav['sqlite']['extraSecurity'] ? 'sqlSEC-table' : 'sql-table';
+        $this->shortcode->getHandlers()->add($tagName, function(ShortcodeInterface $sc) {
             if ( isset($this->grav['sqlite']['error'])  && $this->grav['sqlite']['error'] ) {
                 $this->log($this->grav['sqlite']['error']);
                 return
                     $this->twig->processTemplate(
                     'partials/sql-db-error.html.twig',
-                    [ 'message' =>  $this->grav['sqlite']['error']
-                    ]);
+                    [ 'message' =>  $this->grav['sqlite']['error'] ]
+                    );
             }
             // database exists
             $s = $sc->getContent();
@@ -90,7 +91,7 @@ class SqlTableShortcode extends Shortcode
                 $datafh->save($datafh->content() . '<br><span style="color:blue">' . date('Y-m-d:H:i') . '</span>: '  . $msg);
             } else {
                 $datafh->save('<span style="color:blue">' . date('Y-m-d:H:i') . '</span>: ' . $msg);
-                chmod($path, 0666);
+                chmod($path, 0664);
             }
         }
     }

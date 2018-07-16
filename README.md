@@ -40,6 +40,7 @@ Here is the default configuration and an explanation of available options:
 enabled: true
 database_route: data/sqlite
 database_name: db.sqlite3
+extra_security: false
 logging: false
 all_logging: false # this option only becomes active when logging is True
 error_logging: false # this option only becomes active is False
@@ -50,11 +51,11 @@ update_logging: false
 - `enabled` turns on the plugin for the whole site. If `false`, then making it active on a page will have no effect.  
 - `database_route` is the Grav route (relative to the 'user' subdirectory) to the location of the `SQLite3` database.  
 - `database_name` is the full name (typically with the extension .sqlite3) of the database file. It is the responsibility of the site developer/maintainer to create the database.
+- `extra_security` enables a more paranoid setting. When `true`, a page may only contain an [sql-table] shortcode if the page header explicitly allows for on. (See below for onpage configuration when option is enabled.)
 - `logging` when false, nothing extra happens. When `true`, SQL related data is logged to a file called `sqlite.txt` in the directory given by `database_route`. If however there is an error in setting `database_route`,
 then the directory is `user/data/sqlite`.
 
->SUGGESTION: If the DataManager plugin is installed and the default route is retained, then the SQL logs can be viewed
-from the Admin panel.
+>SUGGESTION: If the DataManager plugin is installed and the default route is retained, then the SQL logs can be viewed from the Admin panel.
 
 - `all_logging` only become active when `logging` is enabled. If true, then all stanzas and errors are recorded.
 - `error_logging` only becomes active when `logging` is enabled and `all_logging` is not enabled.
@@ -66,10 +67,14 @@ from the Admin panel.
 `logging` should not be used in production settings as it writes to the hard drive, slowing performance.
 
 ### Per page configuration
-Shortcodes can be enabled separately using the `shortcode-core` configuration. To disable shortcodes being used on all pages, but only used on selected pages, configure the shortcode-core plugin inside the Admin panel with `enabled=true` and `active=false`. Then on each page where shortcodes are used, include in the front section of the page:
+* Shortcodes can be enabled separately using the `shortcode-core` configuration. To disable shortcodes being used on all pages, but only used on selected pages, configure the shortcode-core plugin inside the Admin panel with `enabled=true` and `active=false`. Then on each page where shortcodes are used, include in the front section of the page:
 ```yaml
 shortcode-core:
   active: true
+```
+* When `extra_security` is enabled, then on a page in which the `[sql-table]` shortcode may be used, the page header must contain
+```yaml
+sqliteSelect: allow
 ```
 
 ## Usage
@@ -86,12 +91,13 @@ this happens, then set `error_logging` to **true** whilst debugging.
 
 ### [sql-table] Shortcode
 
-In the page content the shortcode is used as:
+In the page content the shortcode is used as follows:
 ```md
 [sql-table]SELECT stanza[/sql-table]
 ```
 
-The plugin then generates an html table with the headers as returned by the select stanza, and the body containing the row data.
+If `extra_security` is not enabled, or `extra_security` is enabled ** AND ** the page header contains the field `sqliteSelect: allow`, then
+the plugin then generates an html table (or json, see below) with the headers as returned by the select stanza, and the body containing the row data. (In the remainder of this documentation, it is assumed that `extra_security` is **NOT** enabled.)
 
 The SELECT stanza can be complex referring to multiple tables in the database. An SQLite3 query will return a table of rows with the same number of elements, which will fit into a simple HTML table.
 
@@ -365,6 +371,8 @@ The website designer should therefore make sure that Forms with `sql-insert` and
 For example, using the `Login` plugin, only users with certain privileges or belonging to certain groups can be allowed in.
 
 Alternatively, using the `Private` plugin, a password can be created for the page.
+
+Some plugins allow for authorised users to modify content in the frontend. This would allow a user to add an `[sql-table]` within the markdown content of a page, and thus to access data on a website database. In order to allow a website designer to protect against such an accidental or malicious intrusion, the `extra_security` option is provided in the `sqlite` plugin configuration. It is `false` by default, to allow for backward compatibility. (See above for more information about usage.)
 
 ## To Do
 - Internationalise. Add more languages to `langages.yaml`

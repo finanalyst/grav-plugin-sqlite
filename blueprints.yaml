@@ -1,5 +1,5 @@
 name: Sqlite
-version: '1.4.0'
+version: '1.5.0'
 description: Plugin to select, update and insert into an sqlite3 database
 icon: database
 author:
@@ -26,6 +26,17 @@ form:
             default: data
             label: PLUGIN_SQLITE.DATABASE_ROUTE
             help: PLUGIN_SQLITE.DATABASE_ROUTE_HELP
+        extra_security:
+            type: toggle
+            default: 0
+            highlight: 0
+            options:
+                1: Enabled
+                0: Disabled
+            validate:
+                type: bool
+            label: PLUGIN_SQLITE.EXTRA_SECURITY
+            help: PLUGIN_SQLITE.EXTRA_SECURITY_HELP
         logging:
             type: toggle
             highlight: 0

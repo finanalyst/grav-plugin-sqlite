@@ -28,3 +28,5 @@ en:
         INSERT_LOGGING_HELP: Log file is appended when an INSERT stanza is sent to database.
         UPDATE_LOGGING: Turn on Update Logging.
         UPDATE_LOGGING_HELP: Log file is appended when an UPDATE stanza is sent to database.
+        EXTRA_SECURITY: Enable more paranoid security
+        EXTRA_SECURITY_HELP: Require explicit permission in header of page where SQL table shortcode is used

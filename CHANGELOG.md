@@ -1,3 +1,12 @@
+# v1.5.0
+## 16 June 2018
+1. [](#enhancement)
+    * Extra security option. Allows for more paranoia
+    * When enabled, each page with an [sql-table] shortcode must have explicit header permission
+        * This is to prevent shortcode being added in the frount end by an editor
+1. [](#minorbug)
+    * fix file permission from 0666 to 0664
+
 # v1.4.0
 ## 23 June 2018
 1. [](#enhancement)
