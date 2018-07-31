@@ -1,9 +1,14 @@
+# v1.5.1
+## 1 August 2018
+1. [](#documentation)
+    * A more elaborate example is added to show how to obtain data from a database, change data by  creating a form, then update the row in the database.
+
 # v1.5.0
 ## 16 June 2018
 1. [](#enhancement)
     * Extra security option. Allows for more paranoia
     * When enabled, each page with an [sql-table] shortcode must have explicit header permission
-        * This is to prevent shortcode being added in the frount end by an editor
+        * This is to prevent shortcode being added in the front end by an editor
 1. [](#minorbug)
     * fix file permission from 0666 to 0664
 
