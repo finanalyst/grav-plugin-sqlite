@@ -13,7 +13,7 @@ class SqlTableShortcode extends Shortcode
         $tagName = $this->grav['sqlite']['extraSecurity'] ? 'sqlSEC-table' : 'sql-table';
         $this->shortcode->getHandlers()->add($tagName, function(ShortcodeInterface $sc) {
             if ( isset($this->grav['sqlite']['error'])  && $this->grav['sqlite']['error'] ) {
-                $this->log($this->grav['sqlite']['error']);
+                $this->log(self::ERROR, $this->grav['sqlite']['error']);
                 return
                     $this->twig->processTemplate(
                     'partials/sql-db-error.html.twig',

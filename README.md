@@ -519,6 +519,10 @@ This short code will generate a table with five columns (the client_id column is
 [/datatables]
 ```
 
+## Credits
+For bug fixes, thanks to
+- Matt Marsh @marshmm
+- @dlannan
 
 ## To Do
 - Internationalise. Add more languages to `langages.yaml`

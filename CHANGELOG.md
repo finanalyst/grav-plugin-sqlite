@@ -1,3 +1,12 @@
+# v1.5.2
+## 19 December 2018
+1. [](#bugfix)
+    * propagate id in shortcode to table,
+    * credit to Matt Marsh @marshmm
+2. [](#bugfix)
+    * log function at line 16 SqlTableShortcode requires two parameters, not one.
+    * credit to @dlannan
+
 # v1.5.1
 ## 1 August 2018
 1. [](#documentation)
