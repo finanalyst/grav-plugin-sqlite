@@ -59,7 +59,7 @@ class SqlTableShortcode extends Shortcode
                             'rows' => $rows,
                             'hidden' => $hidden,
                             'class' => isset( $params['class']) ? $params['class'] : '',
-                            'id' => isset($params['id']) ? $param['id'] : ''
+                            'id' => isset($params['id']) ? $params['id'] : ''
                         ]
                     );
                 }
