@@ -521,7 +521,7 @@ This short code will generate a table with five columns (the client_id column is
 
 ## Credits
 For bug fixes, thanks to
-- Matt Marsh @marshmm
+- Matt Marsh @marshmn
 - @dlannan
 
 ## To Do
