@@ -68,7 +68,10 @@ class SqlitePlugin extends Plugin
         if ( ! $this->sqlite['extraSecurity'] ) return; // only  continue if extraSecurity is enabled
         $page = $this->grav['page'];
         // is there explicit permission for this page?
-        if ( $page->header()->{'sqliteSelect'} !== 'allow' ) return;
+        $frontmatter = $page->header();
+        if ( property_exists($frontmatter, 'sqliteSelect') AND $frontmatter->sqliteSelect !== 'allow' ) {
+             return;
+        }
         // extra security is on, so change every occurence of  '[sql' to '[sql-sec'
         $raw = $page->getRawContent();
         $processed = str_replace( [ '[sql' , '[/sql' ], [ '[sqlSEC' , '[/sqlSEC' ], $raw );
