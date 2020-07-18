@@ -523,6 +523,7 @@ This short code will generate a table with five columns (the client_id column is
 For bug fixes, thanks to
 - Matt Marsh @marshmn
 - @dlannan
+- @hughbri - for extra security
 
 ## To Do
 - Internationalise. Add more languages to `langages.yaml`
