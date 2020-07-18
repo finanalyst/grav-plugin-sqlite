@@ -1,3 +1,7 @@
+# v1.5.3
+## 18 July 2020
+1. []](#bugfix) Extra security measure added - credit @hughbris
+
 # v1.5.2
 ## 19 December 2018
 1. [](#bugfix)
