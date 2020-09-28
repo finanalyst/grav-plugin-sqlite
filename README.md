@@ -43,7 +43,7 @@ database_name: db.sqlite3
 extra_security: false
 logging: false
 all_logging: false # this option only becomes active when logging is True
-error_logging: false # this option only becomes active is False
+error_logging: false # this option only becomes active when logging is True and all_logging is False
 select_logging: false
 insert_logging: false
 update_logging: false
