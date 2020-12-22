@@ -1,3 +1,8 @@
+# v1.5.4
+## 22 Dec 2020
+1. [](#typo)
+``* fixed readme
+
 # v1.5.3
 ## 18 July 2020
 1. []](#bugfix) Extra security measure added - credit @hughbris
