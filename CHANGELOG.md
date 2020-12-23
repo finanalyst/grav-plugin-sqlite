@@ -1,6 +1,6 @@
 # v1.5.4
 ## 22-12-2020
-1. [](#enhancement)
+1. [](#improved)
    * fixed readme
 
 # v1.5.3
@@ -18,12 +18,12 @@
 
 # v1.5.1
 ## 01-08-2018
-1. [](#enhancement)
+1. [](#improved)
    * A more elaborate example is added to show how to obtain data from a database, change data by  creating a form, then update the row in the database.
 
 # v1.5.0
 ## 16-06-2018
-1. [](#enhancement)
+1. [](#improved)
    * Extra security option. Allows for more paranoia
    * When enabled, each page with an [sql-table] shortcode must have explicit header permission
    * This is to prevent shortcode being added in the front end by an editor
@@ -32,7 +32,7 @@
 
 # v1.4.0
 ## 23-06-2018
-1. [](#enhancement)
+1. [](#improved)
    * More logging options, allowing for the SELECT, INSERT and UPDATE stanzas (in addition to Errors)
    to be trapped.
    * Append the logged data to the directory `user/data/sqlite` as a 'log.txt' file
@@ -41,13 +41,13 @@
 
 # v1.3.0
 ## 11-06-2018
-1. [](#enhancement)
+1. [](#improved)
    * Add `ignore` field in `sql-insert` and `sql-update`
    * Add `error_logging` configuration option, so that SQL errors are written to hard drive
 
 # v1.2.3
 ## 07-07-2018
-1. [](#enhancement)
+1. [](#improved)
    * Add shortcode dependency to blueprints
 
 # v1.2.2
